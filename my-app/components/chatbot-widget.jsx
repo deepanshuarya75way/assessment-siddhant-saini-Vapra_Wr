@@ -4,13 +4,22 @@ import { MessageCircle } from "lucide-react";
 
 export function ChatbotWidget() {
   function openChat() {
-    if (typeof window === "undefined" || !window.botpress) return;
+    if (typeof window === "undefined") return;
 
-    if (typeof window.botpress.open === "function") {
-      window.botpress.open();
-    } else if (typeof window.botpress.toggle === "function") {
-      window.botpress.toggle();
-    }
+    let attempts = 0;
+    const tryOpen = () => {
+      if (typeof window.botpress?.toggle === "function") {
+        window.botpress.toggle();
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < 40) {
+        window.setTimeout(tryOpen, 250);
+      }
+    };
+
+    tryOpen();
   }
 
   return (
