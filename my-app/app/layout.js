@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { HeaderShell } from "@/components/header-shell";
 import { FooterMap } from "@/components/footer-map";
 import { ClerkAuthShell } from "@/components/clerk-auth-shell";
+import { ChatbotWidget } from "@/components/chatbot-widget";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -134,6 +135,7 @@ export default function RootLayout({ children }) {
           >
             <HeaderShell />
             <main className="min-h-screen pt-24">{children}</main>
+            <ChatbotWidget />
             <footer className="bg-gray-900 text-gray-100 py-16 border-t border-gray-800">
               <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
