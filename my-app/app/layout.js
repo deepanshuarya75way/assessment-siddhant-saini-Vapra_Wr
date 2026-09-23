@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { HeaderShell } from "@/components/header-shell";
@@ -116,6 +117,14 @@ export default function RootLayout({ children }) {
           <link rel="shortcut icon" href="/favicon-32x32.png" />
         </head>
         <body className={`${inter.className}`}>
+          <Script
+            src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"
+            strategy="afterInteractive"
+          />
+          <Script
+            src="https://files.bpcontent.cloud/2026/09/23/06/20260923064956-BFZ9YCQE.js"
+            strategy="afterInteractive"
+          />
           <ClerkAuthShell>
           <ThemeProvider
             attribute="class"
