@@ -4,10 +4,22 @@ import { MessageCircle } from "lucide-react";
 
 export function ChatbotWidget() {
   function openChat() {
-    // Botpress v5 uses the botpressWebChat object and the 'show' event
-    if (typeof window !== "undefined" && window.botpressWebChat) {
-      window.botpressWebChat.sendEvent({ type: "show" });
-    }
+    if (typeof window === "undefined") return;
+
+    let attempts = 0;
+    const tryOpen = () => {
+      if (typeof window.botpress?.toggle === "function") {
+        window.botpress.toggle();
+        return;
+      }
+
+      attempts += 1;
+      if (attempts < 40) {
+        window.setTimeout(tryOpen, 250);
+      }
+    };
+
+    tryOpen();
   }
 
   return (

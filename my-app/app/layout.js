@@ -119,14 +119,14 @@ export default function RootLayout({ children }) {
         <link rel="shortcut icon" href="/favicon-32x32.png" />
       </head>
       <body className={`${inter.className}`}>
-        {/* Load Botpress scripts lazily so they don't block page rendering */}
+        {/* Load the injector before the configuration script initializes the bot. */}
         <Script
           src="https://cdn.botpress.cloud/webchat/v5.0/inject.js"
-          strategy="lazyOnload"
+          strategy="beforeInteractive"
         />
         <Script
           src="https://files.bpcontent.cloud/2026/09/23/06/20260923064956-BFZ9YCQE.js"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         />
         <ClerkAuthShell>
           <ThemeProvider
