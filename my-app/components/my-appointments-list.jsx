@@ -43,6 +43,12 @@ function getRequestStatusMeta(status) {
           "bg-slate-900/60 border-slate-600/70 text-slate-300/90 shadow-inner shadow-slate-950/60",
         description: "This request has been closed.",
       };
+    case "CANCELLED":
+      return {
+        label: "cancelled",
+        badgeClass: "bg-red-900/30 border-red-500/50 text-red-200",
+        description: "This request has been cancelled."
+      };
     default:
       return {
         label: status || "Unknown",
@@ -80,7 +86,7 @@ export default function MyAppointmentsList({ initialRequests, highlightId }) {
 
       setRequests((prev) =>
         prev.map((req) =>
-          req.id === requestId ? { ...req, status: "CLOSED" } : req
+          req.id === requestId ? { ...req, status: "CANCELLED" } : req
         )
       );
 

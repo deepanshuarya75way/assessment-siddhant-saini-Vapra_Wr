@@ -45,6 +45,12 @@ export default async function AdminPage() {
       db.bookingRequest.findMany({
         orderBy: { createdAt: "desc" },
         take: 30,
+        include: {
+          timeline:{
+            orderBy: [{createdAt: "desc"}, {id:"desc"}],
+            include: {actor: {select: {name: true}}},
+          },
+        },
       }),
     ]);
 

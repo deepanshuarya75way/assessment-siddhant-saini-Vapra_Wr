@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Calendar } from "lucide-react";
+import { ReopenServiceRequest } from "@/components/reopen-service-request";
 
 export const metadata = {
   title: "Service History - Vapra Workshop",
@@ -40,6 +41,17 @@ async function getCustomerHistory(clerkUserId) {
         status: true,
         createdAt: true,
         updatedAt: true,
+        timeline: {
+          orderBy: [{createdAt: "desc"}, {id: "desc"}],
+          select: {
+            id: true,
+            description: true,
+            fromStatus: true,
+            toStatus: true,
+            createdAt: true,
+            actor: {select: {name: true}},
+          },
+        },
       },
     });
 
@@ -152,6 +164,33 @@ export default async function ServiceHistoryPage() {
                       ? ` · Last updated ${format(new Date(request.updatedAt), "d MMM yyyy")}`
                       : ""}
                   </p>
+                  {
+                    request.status === "COMPLETED" && (
+                      <ReopenServiceRequest requestId={request.id} />
+                    )
+                  }
+                  {request.timeline?.length > 0 && (
+                    <section className="pt-2" aria-label="Service request timeline">
+                      <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Request timeline
+                      </h3>
+                    <ol className="space-y-2 border-1 border-orange-900/40 pl-3">
+                    {request.timeline.map((event) =>(
+                      <li key={event.id} classname="relative">
+                        <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+                          {event.eventType.replaceALL("_"," ")}
+                        </p>
+                        <p className="text-xs text-muted-foreground whitespace-pre-wrap">
+                          {event.description}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground/70">
+                        {format(new Date(event.createdAt), "d MMM yyyy, h:mm a")}
+                        {event.actor?.name ? `. ${event.actor.name}`:""}
+                        </p>
+                      </li>
+          ))}</ol>
+                    </section>
+                  )}
                 </CardContent>
               </Card>
             );

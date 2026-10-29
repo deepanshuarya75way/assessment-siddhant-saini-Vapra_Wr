@@ -28,6 +28,7 @@ model User {
   customerBookings   Booking[]            @relation("CustomerBookings")
   mechanicBookings   Booking[]            @relation("MechanicBookings")
   bookingRequests    BookingRequest[]
+  bookingRequestTimelineEvents   BookingRequestTimeline[]            @relation("BookingRequestTimelineActor")
   attendances        MechanicAttendance[]
   payments           Payment[]
   vehicles           Vehicle[]
@@ -157,9 +158,26 @@ model BookingRequest {
   preferredTimeSlot String?
   customerName      String?
   customer          User?                @relation(fields: [customerId], references: [id])
+  timeline          BookingRequestTimeline[]
 
   @@index([status, createdAt])
   @@index([phone])
+}
+
+model BookingRequestTimeline{
+  id                String               @id @default(uuid())
+  bookingRequestId  String         
+  eventType         BookingRequestTimelineEventType
+  description       String
+  fromStatus        BookingRequestStatus?
+  toStatus          BookingRequestStatus?
+  actorId           String?
+  createdAt         DateTime            @default(now())
+  bookingRequest    BookingRequest      @relation(fields: [bookingRequestId], references: [id], onDelete: Cascade)
+  actor             User?               @relation("BookingRequestTimelineActor", fields: [actorId], references: [id], onDelete: setNull)
+  
+  @@index([bookingRequestId, createdAt])
+  @@index([actorId])
 }
 
 model FollowUpReminder {
@@ -227,6 +245,13 @@ enum BookingRequestStatus {
   CLOSED
   COMPLETED
   CANCELLED
+}
+
+enum BookingRequestTimelineEventType {
+  REQUEST_CREATED
+  STATUS_CHANGED
+  REOPENED
+  FOLLOW_UP
 }
 
 enum VerificationStatus {
