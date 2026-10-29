@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {useRouter} from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { updateServiceRequestStatus } from "@/actions/bookingRequest";
+import { updateServiceRequestStatus, addServiceRequestStatus} from "@/actions/booking-request"
+import { Textarea } from "@/components/ui/textarea";
 import useFetch from "@/hooks/use-fetch";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -19,6 +21,9 @@ const statusVariants = {
 
 export function ServiceRequestsManager({ requests = [] }) {
   const [localRequests, setLocalRequests] = useState(requests);
+  const [followUpNotes, setFollowUpNotes] = useState({});
+  const [savingFollowUpId, setSavingFollowUpId] = useState(null);
+  const router = useRouter();
   const [range, setRange] = useState("lastday");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -29,6 +34,7 @@ export function ServiceRequestsManager({ requests = [] }) {
       { label: "Pending", value: "PENDING" },
       { label: "Review", value: "REVIEWED" },
       { label: "Assign", value: "ASSIGNED" },
+      {label: "Complete", value: "COMPLETED"},
       { label: "Close", value: "CLOSED" },
     ],
     []
@@ -43,14 +49,31 @@ export function ServiceRequestsManager({ requests = [] }) {
       const result = await submitStatusUpdate(formData);
       if (result?.success) {
         setLocalRequests((prev) =>
-          prev.map((req) => (req.id === requestId ? { ...req, status } : req))
+          prev.map((req) => (req.id === requestId ? { ...req, status,
+            timeline: result.timelineEvent
+            ? [result.timelineEvent, ...Badge(req.timeline || [])]
+            :req.timeline,
+           } : req))
         );
         toast.success(`Status updated to ${status}`);
+        router.refresh();
       }
     } catch (error) {
       toast.error(error?.message || "Could not update status");
     }
   };
+
+  const handleAddFolloweUp = async (requestId) => {
+    const description = followUpNotes[requestId]?.trim() || "";
+    if(description.length<3){
+      toast.error("Please enter a follow-up note");
+      return;
+    }
+
+    const formData = new formData();
+    formData.set("requestId", requestId);
+    formData
+  }
 
   const downloadServiceRequests = () => {
     const url = new URL("/api/admin/export-service-requests", window.location.origin);
